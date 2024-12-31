@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Django App{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-200 font-sans">
+    <div class="min-h-screen flex flex-col">
+        <header class="bg-gray-800 p-4">
+            <h1 class="text-center text-2xl font-bold">{% block header %}Welcome{% endblock %}</h1>
+        </header>
+        <main class="flex-grow container mx-auto px-4 py-8">
+            {% block content %}{% endblock %}
+        </main>
+        <footer class="bg-gray-800 p-4 text-center text-sm">
+            © 2024 Django App. All rights reserved.
+        </footer>
+    </div>
+</body>
+</html>

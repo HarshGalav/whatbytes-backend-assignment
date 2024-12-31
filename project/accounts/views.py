@@ -1,9 +1,13 @@
 from django.shortcuts import render
 
 # Create your views here.
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login,logout,update_session_auth_hash
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.core.mail import EmailMessage
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm,PasswordResetForm
+from django.contrib.auth.models import User
 
 def login_view(request):
     if request.method == 'POST':
@@ -16,9 +20,9 @@ def login_view(request):
             return redirect('dashboard')
         else:
             messages.error(request, 'Invalid credentials')
-    return render(request, 'accounts/login.html')
+    return render(request, 'login.html')
 
-from django.contrib.auth.models import User
+
 
 def signup_view(request):
     if request.method == 'POST':
@@ -32,9 +36,8 @@ def signup_view(request):
             return redirect('login')
         else:
             messages.error(request, 'Passwords do not match')
-    return render(request, 'accounts/signup.html')
+    return render(request, 'signup.html')
 
-from django.contrib.auth.forms import PasswordResetForm
 
 def forgot_password_view(request):
     if request.method == 'POST':
@@ -42,36 +45,50 @@ def forgot_password_view(request):
         form = PasswordResetForm({'email': email})
         if form.is_valid():
             form.save(request=request)
-            messages.success(request, 'Reset instructions sent')
-            return redirect('login')
-    return render(request, 'accounts/forgot_password.html')
 
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import PasswordChangeForm
+            email_message = EmailMessage(
+                'Password Reset Instructions',  
+                'You requested to reset your password. Please check your inbox for further instructions.',  
+                to=[email]  
+            )
+            email_message.send()
+
+            messages.success(request, 'Reset instructions sent to your email.')
+            return redirect('login')
+        else:
+            messages.error(request, 'Invalid email address. Please try again.')
+    return render(request, 'forgot_password.html')
+
 
 @login_required
 def change_password_view(request):
+    # print("REQ:", request)
     if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
+        form = PasswordChangeForm(user=request.user,data= request.POST)
+        print("Form:", form.is_valid())
         if form.is_valid():
+            print("VALID")
             form.save()
+            update_session_auth_hash(request,form.user)
             messages.success(request, 'Password changed successfully')
             return redirect('dashboard')
+        else:
+            print("Invalid", form.errors)
     else:
-        form = PasswordChangeForm(request.user)
-    return render(request, 'accounts/change_password.html', {'form': form})
+        form = PasswordChangeForm(user=request.user)
+    # return None
+    return render(request, 'change_password.html', {'form': form})
 
 @login_required
 def dashboard_view(request):
-    return render(request, 'accounts/dashboard.html', {'username': request.user.username})
+    return render(request, 'dashboard.html', {'username': request.user.username})
 
 @login_required
 def profile_view(request):
-    return render(request, 'accounts/profile.html', {
+    return render(request, 'profile.html', {
         'user': request.user
     })
 
-from django.contrib.auth import logout
 
 def logout_view(request):
     logout(request)

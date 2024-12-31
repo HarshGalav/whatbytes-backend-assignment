@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-gray-800 rounded-lg shadow-lg p-6">
+    <h2 class="text-center text-xl font-bold mb-4">Profile</h2>
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Date Joined:</strong> {{ user.date_joined }}</p>
+    <p><strong>Last Updated:</strong> {{ user.last_login }}</p>
+    <a href="{% url 'dashboard' %}" class="block bg-gray-700 hover:bg-gray-600 text-white py-2 rounded mt-4">Back to Dashboard</a>
+    <a href="{% url 'logout' %}" class="block bg-red-500 hover:bg-red-600 text-white py-2 rounded mt-4">Logout</a>
+</div>
+{% endblock %}
