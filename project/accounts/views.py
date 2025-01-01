@@ -45,7 +45,7 @@ def forgot_password_view(request):
         form = PasswordResetForm({'email': email})
         if form.is_valid():
             form.save(request=request)
-
+            # print(form.errors)
             email_message = EmailMessage(
                 'Password Reset Instructions',  
                 'You requested to reset your password. Please check your inbox for further instructions.',  
@@ -56,6 +56,7 @@ def forgot_password_view(request):
             messages.success(request, 'Reset instructions sent to your email.')
             return redirect('login')
         else:
+            print(form.errors)
             messages.error(request, 'Invalid email address. Please try again.')
     return render(request, 'forgot_password.html')
 
